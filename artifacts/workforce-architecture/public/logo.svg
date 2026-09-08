@@ -1,0 +1,7 @@
+<svg width="160" height="48" viewBox="0 0 160 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="#D8AD54"/>
+  <rect x="14" y="14" width="20" height="20" rx="6" stroke="#202F38" stroke-width="4"/>
+  <circle cx="39" cy="9" r="4" fill="#76B3A7"/>
+  <text x="56" y="23" fill="#26353A" font-family="Arial, sans-serif" font-size="14" font-weight="700">Workforce</text>
+  <text x="56" y="38" fill="#4D9B8D" font-family="Arial, sans-serif" font-size="14" font-weight="700">Architecture</text>
+</svg>
