@@ -38,16 +38,18 @@ router.post("/platform/bootstrap", async (req, res) => {
     const slugBase = companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "business";
     const slug = `${slugBase}-${Date.now().toString(36)}`;
 
-    resolved = await db.transaction(async (tx) => {
+    await db.transaction(async (tx) => {
       const [tenant] = await tx.insert(tenants).values({ name: companyName, slug, countryCode: "CA", dataRegion: "canada", currency: "CAD", plan: "free" }).returning();
       await tx.insert(tenantMemberships).values({ tenantId: tenant.id, userId, role: "owner" });
       await tx.insert(businessWorkspaces).values({ tenantId: tenant.id, name: companyName, locations: ["Canada"] });
       await tx.insert(creditWallets).values({ tenantId: tenant.id, balance: 25, monthlyAllowance: 25, spendingLimit: 25 });
       await tx.insert(agentDefinitions).values(starterAgents.map((agent) => ({ ...agent, tenantId: tenant.id, enabled: false, monthlyCostLimitCad: "25" })));
       await tx.insert(auditEvents).values({ tenantId: tenant.id, actorType: "user", actorId: userId, action: "tenant.bootstrap", resourceType: "tenant", resourceId: tenant.id });
-      return { tenant, membership: { tenantId: tenant.id, userId, role: "owner" } };
     });
+    resolved = await resolveTenant(userId);
   }
+
+  if (!resolved) return res.status(500).json({ error: "tenant bootstrap failed" });
 
   const [workspace] = await db.select().from(businessWorkspaces).where(eq(businessWorkspaces.tenantId, resolved.tenant.id)).limit(1);
   const [wallet] = await db.select().from(creditWallets).where(eq(creditWallets.tenantId, resolved.tenant.id)).limit(1);
