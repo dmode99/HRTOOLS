@@ -18,7 +18,8 @@ export function rateLimit(options: { windowMs: number; max: number }): RequestHa
     res.setHeader("X-RateLimit-Remaining", String(Math.max(0, options.max - bucket.count)));
     if (bucket.count > options.max) {
       res.setHeader("Retry-After", String(Math.ceil((bucket.resetAt - now) / 1000)));
-      return res.status(429).json({ error: "rate limit exceeded" });
+      res.status(429).json({ error: "rate limit exceeded" });
+      return;
     }
     next();
   };
