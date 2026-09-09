@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --dangerously-allow-all-builds
 
+      - name: Build shared TypeScript references
+        run: pnpm exec tsc -b lib/db lib/api-zod --pretty false
+
       - name: Typecheck platform
         run: pnpm --filter @workspace/workforce-architecture run typecheck
 
