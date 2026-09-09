@@ -43,7 +43,7 @@ async function runAnalyticalAgent(purpose: string, permissions: string[], task: 
     signal: AbortSignal.timeout(60_000),
   });
   if (!response.ok) throw new Error(`OpenAI worker request failed: ${response.status}`);
-  const body = await response.json();
+  const body = await response.json() as any;
   return { mode: "openai", text: extractOutputText(body), responseId: body?.id, model: body?.model || MODEL };
 }
 
