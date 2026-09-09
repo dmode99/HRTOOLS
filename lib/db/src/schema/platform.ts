@@ -12,6 +12,14 @@ export const tenants = pgTable("tenants", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => ({ slugIdx: uniqueIndex("tenants_slug_idx").on(table.slug) }));
 
+export const tenantMemberships = pgTable("tenant_memberships", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  role: text("role").notNull().default("owner"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({ tenantUserIdx: uniqueIndex("tenant_memberships_tenant_user_idx").on(table.tenantId, table.userId) }));
+
 export const businessWorkspaces = pgTable("business_workspaces", {
   id: uuid("id").defaultRandom().primaryKey(),
   tenantId: uuid("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
