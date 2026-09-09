@@ -1,0 +1,47 @@
+name: Canada SMB Platform CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'artifacts/workforce-architecture/**'
+      - 'artifacts/api-server/**'
+      - 'lib/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/canada-smb-platform-ci.yml'
+  push:
+    branches:
+      - 'build/canada-smb-platform'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck platform
+        run: pnpm --filter @workspace/workforce-architecture run typecheck
+
+      - name: Typecheck API
+        run: pnpm --filter @workspace/api-server run typecheck
+
+      - name: Build platform
+        run: pnpm --filter @workspace/workforce-architecture run build
+
+      - name: Build API
+        run: pnpm --filter @workspace/api-server run build
